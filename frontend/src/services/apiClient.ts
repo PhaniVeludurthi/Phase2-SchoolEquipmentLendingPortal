@@ -42,7 +42,9 @@ async function request<T>(method: AxiosRequestConfig['method'], path: string, bo
     // Handle non-success HTTP codes
     if (response.status >= 400) {
       const apiError = response.data as any;
+      const errors: string[] | undefined = apiError?.errors ?? apiError?.Errors;
       const message =
+        errors?.[0] ??
         apiError?.message ??
         apiError?.Message ??
         'An unexpected error occurred';
