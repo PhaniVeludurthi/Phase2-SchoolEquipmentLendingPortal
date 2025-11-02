@@ -1,0 +1,57 @@
+services:
+  equipmentlendingapi:
+    container_name: equipmentlendingapi
+    image: ${DOCKER_REGISTRY-}equipmentlendingapi
+    build:
+      context: .
+      dockerfile: EquipmentLendingApi/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=equipment_lending;Username=admin;Password=admin123
+      - AllowedOrigings__0=http://localhost:5173 
+    ports:
+      - "8080"
+      - "8081"
+    depends_on:
+      - postgres
+    networks:
+      - equipment_network 
+
+  postgres:
+    image: postgres
+    container_name: equipment_postgres
+    environment:
+      POSTGRES_DB: equipment_lending
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - equipment_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: equipment_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - equipment_network
+
+
+volumes:
+  postgres_data:
+  pgadmin-data:
+
+networks:
+  equipment_network:
+    driver: bridge 
